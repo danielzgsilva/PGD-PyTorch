@@ -1,0 +1,73 @@
+import numpy as np
+import torch
+from tqdm import tqdm
+from torch import nn
+from torch import optim
+import torch.nn.functional as F
+from torchvision import datasets, transforms, models
+
+from pgd import PGD
+
+def main(experiment, apply_pgd=False):
+    model = None
+    if experiment == 'resnet':
+        model = models.resnet34(pretrained=True)
+    elif experiment == 'vgg':
+        model = models.vgg16(pretrained=True)
+
+    normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                                     std=[0.229, 0.224, 0.225])
+
+    imagenet_data = datasets.ImageFolder('Imagenet/validation/',
+                                         transforms.Compose([
+                                             transforms.Resize(256),
+                                             transforms.CenterCrop(224),
+                                             transforms.ToTensor(),
+                                             normalize]))
+
+    data_loader = torch.utils.data.DataLoader(imagenet_data,
+                                              batch_size=24,
+                                              shuffle=True)  # TODO num_workers for multi-GPU
+
+
+    accuracy = validation(model, data_loader, apply_pgd)
+    print('Accuracy: ', accuracy * 100)
+
+
+def validation(model, data_loader, apply_pgd):
+    if model is None:
+        return
+
+    model.cuda()
+    model.eval()
+
+    pgd_attack = PGD(model, 5, 1, 2)
+    num_correct = 0
+
+    for images, labels in tqdm(data_loader):
+        images.cuda()
+        labels.cuda()
+        if apply_pgd:
+            images = pgd_attack(images, labels)
+
+        with torch.no_grad():
+            print(next(model.parameters()).is_cuda)
+            print(images.get_device())
+            print(labels.get_device())
+            outputs = model(images)
+            predictions = torch.argmax(outputs.data, 1)
+            num_correct += (predictions == labels).sum()
+            # equality = (labels.data == prediction)
+            # accuracy += equality.type(torch.FloatTensor).mean()
+
+    print('correct', num_correct)
+    print('total', len(data_loader.dataset))
+    return num_correct / len(data_loader.dataset)
+
+
+if __name__ == '__main__':
+    print('no pgd: ')
+    main('resnet')
+
+    print('pgd: ')
+    main('resnet', True)
