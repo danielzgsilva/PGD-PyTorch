@@ -29,7 +29,7 @@ def main(experiment, apply_pgd=False):
                                       normalize]))
 
     data_loader = torch.utils.data.DataLoader(imagenet_data,
-                                              batch_size=24,
+                                              batch_size=16,
                                               shuffle=True)  # TODO num_workers for multi-GPU
 
     accuracy = validation(model, data_loader, apply_pgd, device)
@@ -59,6 +59,8 @@ def validation(model, data_loader, apply_pgd, device):
         with torch.no_grad():
             outputs = model(images)
             predictions = torch.argmax(outputs.data, 1)
+            print(labels)
+            print(predictions)
             num_correct += (predictions == labels).sum().item()
 
         batch += 1
