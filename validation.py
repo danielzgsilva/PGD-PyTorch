@@ -46,7 +46,11 @@ def validation(model, data_loader, apply_pgd, device):
     pgd_attack = PGD(model, 5, 1, 2)
     num_correct = 0
 
+    batch = 0
     for images, labels in tqdm(data_loader):
+        if batch > 5:
+            break
+
         images = images.to(device)
         labels = labels.to(device)
         if apply_pgd:
@@ -57,6 +61,8 @@ def validation(model, data_loader, apply_pgd, device):
             predictions = torch.argmax(outputs.data, 1)
             num_correct += (predictions == labels).sum().item()
 
+        batch += 1
+
     return num_correct / len(data_loader.dataset)
 
 
@@ -64,5 +70,5 @@ if __name__ == '__main__':
     print('no pgd: ')
     main('resnet')
 
-    print('pgd: ')
-    main('resnet', True)
+    #print('pgd: ')
+    #main('resnet', True)
