@@ -1,9 +1,5 @@
-import numpy as np
 import torch
 from tqdm import tqdm
-from torch import nn
-from torch import optim
-import torch.nn.functional as F
 from torchvision import datasets, transforms, models
 
 from pgd import PGD
@@ -29,7 +25,7 @@ def main(experiment, apply_pgd=False):
                                       normalize]))
 
     data_loader = torch.utils.data.DataLoader(imagenet_data,
-                                              batch_size=16,
+                                              batch_size=24,
                                               shuffle=True)  # TODO num_workers for multi-GPU
 
     accuracy = validation(model, data_loader, apply_pgd, device)
@@ -48,9 +44,6 @@ def validation(model, data_loader, apply_pgd, device):
 
     batch = 0
     for images, labels in tqdm(data_loader):
-        if batch > 5:
-            break
-
         images = images.to(device)
         labels = labels.to(device)
         if apply_pgd:
@@ -59,8 +52,6 @@ def validation(model, data_loader, apply_pgd, device):
         with torch.no_grad():
             outputs = model(images)
             predictions = torch.argmax(outputs.data, 1)
-            print(labels)
-            print(predictions)
             num_correct += (predictions == labels).sum().item()
 
         batch += 1
