@@ -39,8 +39,9 @@ def validation(model, data_loader, apply_pgd, device):
     model.to(device)
     model.eval()
 
-    pgd_attack = PGD(model, 5, 1, 2)
+    pgd_attack = PGD(model, device, 5, 1, 2)
     num_correct = 0
+    total = 0
 
     batch = 0
     for images, labels in tqdm(data_loader):
@@ -55,13 +56,14 @@ def validation(model, data_loader, apply_pgd, device):
             num_correct += (predictions == labels).sum().item()
 
         batch += 1
+        total += images.size(0)
 
-    return num_correct / len(data_loader.dataset)
+    return num_correct / total
 
 
 if __name__ == '__main__':
     print('no pgd: ')
     main('resnet')
 
-    #print('pgd: ')
-    #main('resnet', True)
+    print('pgd: ')
+    main('resnet', True)
