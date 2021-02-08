@@ -33,7 +33,7 @@ class PGD(nn.Module):
 
             elif self.norm == 2:
                 ind = tuple(range(1, len(images.shape)))
-                grad = grad / (torch.sqrt(torch.sum(grad * grad, axis=ind, keepdims=True)) + 10e-8)
+                grad = grad / (torch.sqrt(torch.sum(grad * grad, dim=ind, keepdim=True)) + 10e-8)
 
             assert(images.shape == grad.shape)
             adv = adv + grad * self.alpha

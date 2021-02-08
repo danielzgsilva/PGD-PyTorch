@@ -17,12 +17,16 @@ def main(experiment, apply_pgd=False):
     normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                      std=[0.229, 0.224, 0.225])
 
-    imagenet_data = datasets.ImageFolder('~/Imagenet/validation/',
-                                      transforms.Compose([
+    # Correct Metadata URL
+    datasets.imagenet.ARCHIVE_DICT['devkit']['url'] = "https://github.com/goodclass/PythonAI/raw/master/imagenet/ILSVRC2012_devkit_t12.tar.gz"
+    
+    imagenet_data = datasets.ImageNet('~/Imagenet',
+                                      transform=transforms.Compose([
                                       transforms.Resize(256),
                                       transforms.CenterCrop(224),
                                       transforms.ToTensor(),
-                                      normalize]))
+                                      normalize]), split='val')
+
 
     data_loader = torch.utils.data.DataLoader(imagenet_data,
                                               batch_size=24,
@@ -62,8 +66,9 @@ def validation(model, data_loader, apply_pgd, device):
 
 
 if __name__ == '__main__':
-    print('no pgd: ')
-    main('resnet')
+    #print('no pgd: ')
+    # main('resnet')
+    #main('vgg')
 
     print('pgd: ')
     main('resnet', True)
