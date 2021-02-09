@@ -47,7 +47,7 @@ def main(experiment, pgd_params=None):
 def validation(model, data_loader, device, pgd_attack=None):
     if model is None:
         print('null model')
-        return
+        return -1
 
     model.to(device)
     model.eval()
