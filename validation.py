@@ -41,7 +41,7 @@ def main(experiment, pgd_params=None):
                          iters=pgd_params['iterations'])
 
     accuracy = validation(model, data_loader, device, pgd_attack)
-    print('Accuracy: ', accuracy * 100)
+    print('Accuracy: ', accuracy * 100, flush=True)
 
 
 def validation(model, data_loader, device, pgd_attack=None):
@@ -82,8 +82,8 @@ if __name__ == '__main__':
     # run all experiments
     for arch in model_archs:
         # first get baseline accuracy for each model
-        print('<----------- Baseline for {} ----------->'.format(arch))
-        #main(arch)
+        print('<----------- Baseline for {} ----------->'.format(arch), flush=True)
+        main(arch)
 
         # then evaluate with PGD attack while varying parameters
         # norm - 2 or inf
@@ -97,7 +97,7 @@ if __name__ == '__main__':
                 iterations = 2 * eps
 
                 print('<----------- PGD attack on {} with norm={} epsilon={} step size={} iterations={} ----------->'.
-                      format(arch, norm, eps, alpha, iterations))
+                      format(arch, norm, eps, alpha, iterations), flush=True)
 
                 pgd_params = {'norm': norm, 'eps': eps, 'alpha': alpha, 'iterations': iterations}
                 main(arch, pgd_params)
