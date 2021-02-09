@@ -46,6 +46,7 @@ def main(experiment, pgd_params=None):
 
 def validation(model, data_loader, device, pgd_attack=None):
     if model is None:
+        print('null model')
         return
 
     model.to(device)
@@ -79,10 +80,10 @@ if __name__ == '__main__':
     epsilons = [i for i in range(2, 11)]
 
     # run all experiments
-    for model in models:
+    for arch in models:
         # first get baseline accuracy for each model
-        print('<----------- Baseline for {} ----------->'.format(model))
-        #main(model)
+        print('<----------- Baseline for {} ----------->'.format(arch))
+        #main(arch)
 
         # then evaluate with PGD attack while varying parameters
         # norm - 2 or inf
@@ -96,7 +97,7 @@ if __name__ == '__main__':
                 iterations = 2 * eps
 
                 print('<----------- PGD attack on {} with norm={} epsilon={} step size={} iterations={} ----------->'.
-                      format(model, norm, eps, alpha, iterations))
+                      format(arch, norm, eps, alpha, iterations))
 
                 pgd_params = {'norm': norm, 'eps': eps, 'alpha': alpha, 'iterations': iterations}
-                main(model, pgd_params)
+                main(arch, pgd_params)
