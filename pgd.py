@@ -3,15 +3,14 @@ import torch.nn as nn
 import numpy as np
 
 class PGD(nn.Module):
-    def __init__(self, model, device, eps, alpha=1, norm=2):
+    def __init__(self, model, device, norm, eps, alpha, iters):
         super(PGD, self).__init__()
         assert(2 <= eps <= 10)
         assert(norm in [2, 'inf', np.inf])
         self.eps = eps
-        #self.alpha = alpha
-        self.alpha = 1
+        self.alpha = alpha
         self.norm = norm
-        self.iterations = 2 * eps
+        self.iterations = iters
         self.loss = nn.CrossEntropyLoss()
         self.model = model
         self.device = device
