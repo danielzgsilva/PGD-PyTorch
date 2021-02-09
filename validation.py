@@ -75,12 +75,12 @@ def validation(model, data_loader, device, pgd_attack=None):
 
 
 if __name__ == '__main__':
-    models = ['resnet', 'vgg']
+    model_archs = ['resnet', 'vgg']
     norms = [2, "inf"]
     epsilons = [i for i in range(2, 11)]
 
     # run all experiments
-    for arch in models:
+    for arch in model_archs:
         # first get baseline accuracy for each model
         print('<----------- Baseline for {} ----------->'.format(arch))
         #main(arch)
