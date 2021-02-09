@@ -75,7 +75,7 @@ def validation(model, data_loader, device, pgd_attack=None):
 
 
 if __name__ == '__main__':
-    models = ['resnet, pgd']
+    models = ['resnet', 'vgg']
     norms = [2, "inf"]
     epsilons = [i for i in range(2, 11)]
 
