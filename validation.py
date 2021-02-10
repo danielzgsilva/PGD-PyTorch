@@ -1,5 +1,4 @@
 import torch
-from tqdm import tqdm
 from torchvision import datasets, transforms, models
 
 from pgd import PGD
@@ -10,7 +9,8 @@ def main(experiment, pgd_params=None):
     if experiment == 'resnet':
         model = models.resnet34(pretrained=True)
     elif experiment == 'vgg':
-        model = models.vgg16(pretrained=True)
+        # VGG with batch normalization
+        model = models.vgg16_bn(pretrained=True)
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -56,7 +56,7 @@ def validation(model, data_loader, device, pgd_attack=None):
     total = 0
     batch = 0
 
-    for images, labels in tqdm(data_loader):
+    for images, labels in data_loader:
         images = images.to(device)
         labels = labels.to(device)
 

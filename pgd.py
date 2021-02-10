@@ -7,7 +7,7 @@ class PGD(nn.Module):
         super(PGD, self).__init__()
         assert(2 <= eps <= 10)
         assert(norm in [2, 'inf', np.inf])
-        self.eps = eps
+        self.eps = eps / 255.0
         self.alpha = alpha
         self.norm = norm
         self.iterations = iters
