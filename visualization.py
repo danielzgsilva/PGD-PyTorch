@@ -31,33 +31,35 @@ if __name__ == '__main__':
     model.to(device)
     model.eval()
 
-    images, labels = next(iter(data_loader))
-    images = images.to(device)
-    labels = labels.to(device)
+    for images, labels in data_loader:
+        images = images.to(device)
+        labels = labels.to(device)
 
-    adv_images = pgd(images, labels)
+        adv_images = pgd(images, labels)
 
-    with torch.no_grad():
-        outputs = model(adv_images)
-        predictions = torch.argmax(outputs.data, 1)
+        with torch.no_grad():
+            outputs = model(adv_images)
+            predictions = torch.argmax(outputs.data, 1)
+    
+            adv_outputs = model(adv_images)
+            adv_predictions = torch.argmax(adv_outputs.data, 1)
 
-        adv_outputs = model(adv_images)
-        adv_predictions = torch.argmax(adv_outputs.data, 1)
+        bs = images.size(0)
+        for i in range(bs):
+            orig_image = images[i]
+            adv_image = adv_images[i]
 
-    bs = images.size(0)
-    for i in range(bs):
-        orig_image = images[i]
-        adv_image = adv_images[i]
+            gt = imagenet_data.classes[labels[i].item()]
+            orig_pred = imagenet_data.classes[predictions[i].item()]
+            adv_pred = imagenet_data.classes[adv_predictions[i].item()]
 
-        gt = imagenet_data.classes[labels[i].item()]
-        orig_pred = imagenet_data.classes[predictions[i].item()]
-        adv_pred = imagenet_data.classes[adv_predictions[i].item()]
+            orig_name = "orig_gt_{}_pred_{}.jpg".format(gt, orig_pred)
+            adv_name = "adv_gt_{}_pred_{}.jpg".format(gt, adv_pred)
 
-        orig_name = "orig_gt_{}_pred_{}.jpg".format(gt, orig_pred)
-        adv_name = "adv_gt_{}_pred_{}.jpg".format(gt, adv_pred)
+            save_image(orig_image, orig_name)
+            save_image(adv_image, adv_name)
 
-        save_image(orig_image, orig_name)
-        save_image(adv_image, adv_name)
+            break
 
 
 
