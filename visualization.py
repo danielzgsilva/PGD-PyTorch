@@ -15,7 +15,8 @@ if __name__ == '__main__':
 
     imagenet_data = datasets.ImageNet('~/Imagenet',
                                       transform=transforms.Compose([
-                                          transforms.Resize(224),
+                                          transforms.Resize(256),
+                                          transforms.CenterCrop(224),
                                           transforms.ToTensor()]), split='val')
 
     data_loader = torch.utils.data.DataLoader(imagenet_data,
@@ -40,7 +41,7 @@ if __name__ == '__main__':
         with torch.no_grad():
             outputs = model(adv_images)
             predictions = torch.argmax(outputs.data, 1)
-    
+
             adv_outputs = model(adv_images)
             adv_predictions = torch.argmax(adv_outputs.data, 1)
 
