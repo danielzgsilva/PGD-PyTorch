@@ -39,7 +39,7 @@ if __name__ == '__main__':
     adv_images = pgd(images, labels)
 
     with torch.no_grad():
-        outputs = model(adv_images)
+        outputs = model(images)
         predictions = torch.argmax(outputs.data, 1)
 
         adv_outputs = model(adv_images)
