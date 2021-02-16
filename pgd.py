@@ -55,16 +55,12 @@ class PGD(nn.Module):
                 adv = torch.max(torch.min(adv, images + self.eps), images - self.eps)
 
             elif self.norm == 2:
-                delta = adv - images
-
-                mask = self.eps >= delta.view(delta.shape[0], -1).norm(self.norm, dim=1)
-
-                scaling_factor = delta.view(delta.shape[0], -1).norm(self.norm, dim=1)
-                scaling_factor[mask] = self.eps
-
-                delta *= self.eps / scaling_factor.view(-1, 1, 1, 1)
-
-                adv = images + delta
+                d = adv - images
+                mask = self.eps >= d.view(d.shape[0], -1).norm(self.norm, dim=1)
+                scale = d.view(d.shape[0], -1).norm(self.norm, dim=1)
+                scale[mask] = self.eps
+                d *= self.eps / scale.view(-1, 1, 1, 1)
+                adv = images + d
 
             # clamp into 0-1 range
             adv = adv.clamp(0.0, 1.0)
