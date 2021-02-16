@@ -1,9 +1,9 @@
 #!/bin/bash
 
-#SBATCH --time=01:00:00
+#SBATCH --time=48:00:00
 #SBATCH --cpus-per-gpu=4
 #SBATCH --gpus=1
-#SBATCH --output=dumpt-%J.out
+#SBATCH --output=PGD_attack.out
 
 # Give this process 1 task (per GPU, but only one GPU), then assign eight 8per task
 # (so 8 cores overall).  Then enforce that slurm assigns only CPUs that are on the
@@ -34,6 +34,7 @@ echo
 
 # Run TensorFlow
 echo
+# python build_folder_tree.py -split_path '~/Imagenet'
 time python validation.py
 echo
 
