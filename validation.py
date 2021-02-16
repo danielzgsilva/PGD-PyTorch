@@ -6,6 +6,7 @@ from pgd import PGD
 
 def main(experiment, pgd_params=None):
     model = None
+    # get pretrained pytorch model
     if experiment == 'resnet':
         model = models.resnet34(pretrained=True)
     elif experiment == 'vgg':
@@ -14,6 +15,7 @@ def main(experiment, pgd_params=None):
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
+    # normalize images to normal distribution
     normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                      std=[0.229, 0.224, 0.225])
 
@@ -33,6 +35,7 @@ def main(experiment, pgd_params=None):
                                               shuffle=True)  # TODO num_workers for multi-GPU
 
     pgd_attack = None
+    # create a PGD attack with desired params
     if pgd_params is not None:
         pgd_attack = PGD(model, device,
                          norm=pgd_params['norm'],
@@ -40,11 +43,13 @@ def main(experiment, pgd_params=None):
                          alpha=pgd_params['alpha'],
                          iters=pgd_params['iterations'])
 
+    # evaluate model
     accuracy = validation(model, data_loader, device, pgd_attack)
     print('Accuracy: ', accuracy * 100, flush=True)
 
 
 def validation(model, data_loader, device, pgd_attack=None):
+    # calculate the classification accuracy of a
     if model is None:
         print('null model')
         return -1
@@ -60,9 +65,11 @@ def validation(model, data_loader, device, pgd_attack=None):
         images = images.to(device)
         labels = labels.to(device)
 
+        # generate pgd perturbation
         if pgd_attack is not None:
             images = pgd_attack(images, labels)
 
+        # make prediction and evaluate batch accuracy
         with torch.no_grad():
             outputs = model(images)
             predictions = torch.argmax(outputs.data, 1)
@@ -71,12 +78,15 @@ def validation(model, data_loader, device, pgd_attack=None):
         batch += 1
         total += images.size(0)
 
+    # return overall classification accuracy
     return num_correct / total
 
 
 if __name__ == '__main__':
     model_archs = ['resnet', 'vgg']
     norms = [2, "inf"]
+
+    # vary epsilon from 2 to 10
     epsilons = [i for i in range(2, 11)]
 
     # run all experiments
@@ -96,6 +106,7 @@ if __name__ == '__main__':
                 alpha = 1
                 iterations = 2 * eps
 
+                # display result
                 print('<----------- PGD attack on {} with norm={} epsilon={} step size={} iterations={} ----------->'.
                       format(arch, norm, eps, alpha, iterations), flush=True)
 
