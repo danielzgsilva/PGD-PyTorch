@@ -65,7 +65,7 @@ class PGD(nn.Module):
             # clamp into 0-1 range
             adv = adv.clamp(0.0, 1.0)
 
-            # return adversarial example
-            return adv.detach()
+        # return adversarial example
+        return adv.detach()
 
 
